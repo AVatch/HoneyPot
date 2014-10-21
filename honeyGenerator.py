@@ -1,6 +1,9 @@
 import sys
 
 
+import prefix
+import suffix
+
 '''
 Main Functions
 '''
@@ -21,4 +24,4 @@ Helper Functions
 # Execute Code
 if __name__ == '__main__':
     args = sys.argv
-    pollinateMe()
+    pollinateMe(1, 1)
