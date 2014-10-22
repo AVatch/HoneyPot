@@ -1,4 +1,4 @@
-suffix_list = [
+SUFFIX_LIST = [
     's',
     'ed',
     't',

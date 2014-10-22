@@ -1,4 +1,4 @@
-prefix_list = [
+PREFIX_LIST = [
     'a',
     'acro',
     'allo',
