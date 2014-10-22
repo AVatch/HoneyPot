@@ -11,8 +11,9 @@ Main Functions
 
 
 def pollinateMe(p, k):
-    # word_parts(p, 0.2)
-    l33t_word(p, 1)
+    # word_parts(p, 1)
+    # l33t_word(p, 1)
+    # delta_word(p, 1)
 
 
 def unPollinateMe(p, k):
@@ -71,8 +72,24 @@ def l33t_word(word, weight):
     print "[l33t] Output:\t", word
 
 
-def delta_inc(word, weight):
-    pass
+def delta_word(word, weight):
+    print "[delta word] Input:\t", word
+    p = random.random()
+
+    for ind, char in enumerate(word):
+        if char.isdigit():
+            if p <= weight:
+                r = random.random()
+                if r <= 0.5:
+                    word = list(word)
+                    word[ind] = str(int(char) + 1)
+                    word = "".join(word)
+                else:
+                    word = list(word)
+                    word[ind] = str(int(char) - 1)
+                    word = "".join(word)
+
+    print "[delta word] Output:\t", word
 
 # Execute Code
 if __name__ == '__main__':
