@@ -18,15 +18,19 @@ def pollinateMe(p, k):
     # Choose a random seed for every bucket
     for i in range(0,buckets) :
         seed = random.choice(pot)
-
+        n_trans = random.randrange(1,len(hf.FUNCTIONS))
         # Choose a random function for every count in bucket
         for j in range(0,count) :
-            weight = random.random()
-            func = random.choice(hf.FUNCTIONS)
-            honey = func(seed,weight)
-            while honey in pot:
+            honey = seed
+            # Transform word a random number of times
+            for k in range(0,n_trans) :
+                weight = random.random()
                 func = random.choice(hf.FUNCTIONS)
-                honey = func(seed,weight)
+                honey = func(honey,weight)
+                # Make sure the honey isn't already in the pot
+                while honey in pot:
+                    func = random.choice(hf.FUNCTIONS)
+                    honey = func(honey,weight)
             pot.append(honey)
 
     random.shuffle(pot)

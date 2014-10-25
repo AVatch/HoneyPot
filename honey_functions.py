@@ -1,5 +1,6 @@
 import random
-
+import datetime
+import re
 import prefix
 import suffix
 
@@ -97,6 +98,42 @@ def delta_word(word, weight):
     #print "[delta word] Output:\t", word
     return word
 
+'''
+  Tweaks the year
+'''
+def year_tweaker(password, weight):
+    ## detects yr between 1950-2014 and changes yr
+    ## to year + 1 in password
+    match = re.findall(r'\d{4}', password)
+    for m in match:
+        if int(m) in range(1950,2015):
+            n = int(m) + 1
+            password = password.replace(m,str(n))
+    return password
+
+'''
+    Tweaks the tail
+'''
+def tail_tweaker(password, weight):
+    #tweaks the tail of a password with a random digit at the end
+    tuples = re.findall(r'(\w+?)(\d+)', password)
+    for x,y in tuples[-1:]:
+        tail = int(y) + random.randint(0,10)
+        password = password.replace(y,str(tail))
+    return password
+
+'''
+    Tweaks the head
+'''
+def head_tweaker(password, weight):
+    #tweaks the head of a password with random digits
+    tuples = re.findall(r'(\w+?)(\d+)', password) 
+    for y in tuples[0]:
+        head = int(y) + random.randint(0,10)
+        password = password.replace(y,str(head))
+    return password
+
+
 
 '''
 Add all function names here
@@ -105,6 +142,9 @@ Add all function names here
 FUNCTIONS = [
     word_parts,
     l33t_word,
-    delta_word
+    delta_word,
+    year_tweaker,
+    tail_tweaker,
+    head_tweaker
 ]
 
