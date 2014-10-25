@@ -68,7 +68,6 @@ def l33t_word(word, weight):
         if p < weight:
             if char in L33T_LIST:
                 word[i] = L33T_LIST[char]
-                print word
     word = "".join(word)
     #print "[l33t] Output:\t", word
     return word

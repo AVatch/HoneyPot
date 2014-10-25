@@ -13,7 +13,7 @@ def pollinateMe(p, k):
     buckets = random.randrange(1,k)
     while (k % buckets):
         buckets = random.randrange(1,k)
-    count = k/buckets
+    count = int(k/buckets)
 
     # Choose a random seed for every bucket
     for i in range(0,buckets) :
@@ -50,8 +50,8 @@ if __name__ == '__main__':
     if action == 'pollinate':
         #print 'pollinating'
         words = pollinateMe(password, k_honey_words)
-        print 'HONEY WORDS:\n', "\n".join(words)
+        print ('HONEY WORDS:\n', '\n'.join(words))
     elif action == 'unpollinate':
-        print 'un-pollinating'
+        print ('un-pollinating')
     else:
-        print "unknown action"
+        print ('unknown action')
