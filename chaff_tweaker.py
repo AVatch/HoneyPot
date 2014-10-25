@@ -14,23 +14,61 @@ def year_tweaker(password):
 			password = password.replace(m,str(n))
 	print password
 
-def tail_teaker(password):
-	#tweaks the tail of a password with a random digit at the end
+def tail_tweaker(password):
+	# tweaks the tail a substring of consecutives digits within 
+	# a password with a random digit at end of string
 	tuples = re.findall(r'(\w+?)(\d+)', password)
 	for x,y in tuples[-1:]:
 		tail = int(y) + random.randint(0,10)
-		password = password.replace(y,str(tail))
+		if password.replace(y,str(tail)) == password:
+			password = password.replace(y,str(tail-1))
+		else:
+			password = password.replace(y,str(tail))
 	print password
 
 def head_tweaker(password):
-	#tweaks the head of a password with random digits
-	tuples = re.findall(r'(\w+?)(\d+)', password) 
-	for y in tuples[0]:
-		head = int(y) + random.randint(0,10)
-		password = password.replace(y,str(head))
+	# tweaks the head of a password with random digits
+	# if password doesn't start with digits returns same password
+	tuples = re.findall(r'(\w+?)(\d+)', password)
+	if tuples == []:
+		print password 
+	else:
+		for y in tuples[0]:
+			try:
+				head = int(y) + random.randint(0,10)
+				password = password.replace(y,str(head))
+			except ValueError:
+				break
+		print password
+
+def lower_case(password):
+	# tweaks upper case letters to lower case
+	new_password = ''
+	for l in range(len(password)):
+		if password[l].isupper() == True:
+			new_password += password[l].lower()
+		else:
+			new_password += password[l]
+	print new_password
+
+def upper_case(password):
+	# tweaks lower case letters to upper case in alternate fashion
+	new_password = ''
+	for l in range(0,len(password),2):
+		if password[l].islower() == True:
+			password = password.replace(password[l], password[l].upper())
+		else:
+			continue
 	print password
 
-## test ##
+## tests ##
 year_tweaker('1234password19992010')
-tail_teaker('1234hihi55667934')
+tail_tweaker('1234hihi55667934')
 head_tweaker('1234hihi55667934')
+head_tweaker('hihi55667934')
+lower_case('Password1234Hello')
+tail_tweaker('1234pass345word567')
+upper_case('forever')
+head_tweaker('pass5555word')
+
+
