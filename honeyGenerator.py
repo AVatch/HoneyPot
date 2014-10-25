@@ -8,12 +8,18 @@ Main Functions
 
 def pollinateMe(p, k):
     pot = [p]
+
+    # Get number of buckets
     buckets = random.randrange(1,k)
     while (k % buckets):
         buckets = random.randrange(1,k)
     count = k/buckets
+
+    # Choose a random seed for every bucket
     for i in range(0,buckets) :
         seed = random.choice(pot)
+
+        # Choose a random function for every count in bucket
         for j in range(0,count) :
             weight = random.random()
             func = random.choice(hf.FUNCTIONS)

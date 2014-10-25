@@ -4,6 +4,12 @@ import prefix
 import suffix
 
 '''
+IMPORTANT: Add all function names to list 'FUNCTIONS' at the bottom of this file.
+
+'''
+
+
+'''
 Gives back a word with parts of it changed
 
 '''
@@ -49,20 +55,21 @@ Gives back a leet version of the given word
 
 '''
 
-L33T_LIST = [
-    {'e': '3'},
-    {'o': '0'},
-    {'l', '1'},
-    {'a', '@'}
-]
+L33T_LIST = {
+    'a': '@','b': '13','e': '3', 'f':'ph', 'g': '6',
+    'o': '0','l': '1','s': '$','r': 'i2','w': 'vv'
+}
 
 def l33t_word(word, weight):
     #print "[l33t] Input:\t", word
-    for char in word:
+    word = list(word)
+    for i, char in enumerate(word):
         p = random.random()
-        if p <= weight:
-            for i, j in enumerate(L33T_LIST):
-                pass #print i, j
+        if p < weight:
+            if char in L33T_LIST:
+                word[i] = L33T_LIST[char]
+                print word
+    word = "".join(word)
     #print "[l33t] Output:\t", word
     return word
 
