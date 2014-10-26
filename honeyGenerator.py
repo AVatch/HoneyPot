@@ -1,7 +1,8 @@
 import sys
 import random
 import honey_functions as hf
-from difflib import SequenceMatcher
+from rock_you_generator import distance_ratio
+
 
 '''
 Main Functions
