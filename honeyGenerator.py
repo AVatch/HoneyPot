@@ -1,7 +1,7 @@
 import sys
 import random
 import honey_functions as hf
-from rock_you_generator import distance_ratio
+from rock_you_generator import distance_ratio, rock_you_like_a_hurricane
 
 
 '''
@@ -11,6 +11,10 @@ Main Functions
 
 def pollinateMe(p, k):
     pot = [p]
+
+    print "~"*50
+    print rock_you_like_a_hurricane(p, 5)
+    print "~"*50
 
     # Get number of buckets
     buckets = random.randrange(1, k)
