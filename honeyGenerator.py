@@ -22,7 +22,8 @@ def pollinateMe(p, k):
     for i in range(0, buckets):
         # seed = random.choice(pot)
         seed = p
-        n_trans = random.randrange(1, len(hf.FUNCTIONS))
+        # n_trans = random.randrange(1, len(hf.FUNCTIONS))
+        n_trans = random.randrange(1, 3)
         # Choose a random function for every count in bucket
         for j in range(0, count):
             honey = seed
@@ -33,13 +34,10 @@ def pollinateMe(p, k):
                 honey = func(honey, weight)
                 # Make sure the honey isn't already in the pot
                 while honey in pot or distance_ratio(honey, p) <= 75:
-                    if len(honey) > 10:
-                        break
-
                     func = random.choice(hf.FUNCTIONS)
-                    honey = func(honey, weight)
+                    honey = func(seed, weight)
 
-                print func, '\t->\t', honey
+                print func, '\t->\t', honey, '\t', distance_ratio(honey, p)
             pot.append(honey)
 
     random.shuffle(pot)
