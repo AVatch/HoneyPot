@@ -14,6 +14,7 @@ def pollinateMe(p, k):
     # word_parts(p, 1)
     # l33t_word(p, 1)
     # delta_word(p, 1)
+    entropy(p)
 
 
 def unPollinateMe(p, k):
@@ -22,6 +23,21 @@ def unPollinateMe(p, k):
 '''
 Helper Functions
 '''
+
+
+def entropy(word):
+    upper = 0
+    lower = 0
+    digits = 0
+    for i in word:
+        if i.isdigit():
+            digits += 1
+        if i.isupper():
+            upper += 1
+        if i.islower():
+            lower += 1
+
+    print upper, '\t', lower, '\t', digits
 
 
 def word_parts(word, weight):
@@ -75,7 +91,6 @@ def l33t_word(word, weight):
 def delta_word(word, weight):
     print "[delta word] Input:\t", word
     p = random.random()
-
     for ind, char in enumerate(word):
         if char.isdigit():
             if p <= weight:
@@ -88,8 +103,8 @@ def delta_word(word, weight):
                     word = list(word)
                     word[ind] = str(int(char) - 1)
                     word = "".join(word)
-
     print "[delta word] Output:\t", word
+    return word
 
 # Execute Code
 if __name__ == '__main__':
