@@ -26,7 +26,8 @@ def clean_rock_passwords(filecsv):
 	for i in rock_passwords:
 		writer.writerow([i])
 
-def distace_ratio(s1, s2):
+
+def distance_ratio(s1, s2):
     if s1 is None:
         raise TypeError("s1 is None")
     if s2 is None:
@@ -35,6 +36,6 @@ def distace_ratio(s1, s2):
         return 0
 
     m = SequenceMatcher(None, s1, s2)
-    print int((100 * m.ratio()))
+    return int((100 * m.ratio()))
 
-distace_ratio("NEW YORK METS", "NEW YORK MEATS")
+

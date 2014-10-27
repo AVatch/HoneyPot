@@ -1,7 +1,7 @@
 import sys
 import random
 import honey_functions as hf
-# from rock_you_generator import distance_ratio
+from rock_you_generator import distance_ratio
 
 
 '''
@@ -20,7 +20,8 @@ def pollinateMe(p, k):
 
     # Choose a random seed for every bucket
     for i in range(0, buckets):
-        seed = random.choice(pot)
+        # seed = random.choice(pot)
+        seed = p
         n_trans = random.randrange(1, len(hf.FUNCTIONS))
         # Choose a random function for every count in bucket
         for j in range(0, count):
@@ -31,7 +32,10 @@ def pollinateMe(p, k):
                 func = random.choice(hf.FUNCTIONS)
                 honey = func(honey, weight)
                 # Make sure the honey isn't already in the pot
-                while honey in pot:
+                while honey in pot or distance_ratio(honey, p) <= 75:
+                    if len(honey) > 10:
+                        break
+
                     func = random.choice(hf.FUNCTIONS)
                     honey = func(honey, weight)
 

@@ -4,8 +4,8 @@ import prefix
 import suffix
 
 '''
-IMPORTANT: Add all function names to list 'FUNCTIONS' at the bottom of this file.
-
+IMPORTANT: Add all function names to list 'FUNCTIONS' at
+the bottom of this file.
 '''
 
 
@@ -15,7 +15,7 @@ def word_parts(word, weight):
     if p <= weight:
         # Switch both pre + suff
         for i in prefix.PREFIX_LIST:
-            if i in word:
+            if i in word[:len(word)-len(word)/3] or i in word[len(word)-len(word)/3:]:
                 r = int(random.random()*len(prefix.PREFIX_LIST))
                 word = word.replace(i, prefix.PREFIX_LIST[r])
                 break
@@ -157,7 +157,7 @@ Add all function names here
 '''
 
 FUNCTIONS = [
-    word_parts,
+    # word_parts,
     l33t_word,
     delta_word,
     year_tweaker,
