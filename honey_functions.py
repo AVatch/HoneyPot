@@ -84,7 +84,7 @@ def delta_word(word, weight):
                     word = "".join(word)
                 else:
                     word = list(word)
-                    word[ind] = str(int(char) - 1)
+                    word[ind] = str(abs(int(char) - 1))
                     word = "".join(word)
 
     #print "[delta word] Output:\t", word

@@ -34,6 +34,8 @@ def pollinateMe(p, k):
                 while honey in pot:
                     func = random.choice(hf.FUNCTIONS)
                     honey = func(honey, weight)
+
+                print func, '\t->\t', honey
             pot.append(honey)
 
     random.shuffle(pot)
@@ -77,6 +79,7 @@ if __name__ == '__main__':
     if action == 'pollinate':
         #print 'pollinating'
         words = pollinateMe(password, k_honey_words)
+        print "*"*50
         print 'HONEY WORDS:\n', '\n'.join(words)
     elif action == 'unpollinate':
         print 'un-pollinating'
