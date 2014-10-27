@@ -6,25 +6,26 @@ Reading in rock you data set, and cleaning it out, saves to new listanf file
 
 '''
 
+
 def clean_rock_passwords(filecsv):
-	rock_passwords = []
-	f = open(filecsv, 'rw')
-	try:
-	    reader = csv.reader(f)
-	    for row in reader:
-	    	temp = row[0].split()
-	    	if len(temp) == 2:
-	    		rock_passwords.append(temp[1])
-	finally:
-	    f.close()
+    rock_passwords = []
+    f = open(filecsv, 'rw')
+    try:
+        reader = csv.reader(f)
+        for row in reader:
+            temp = row[0].split()
+            if len(temp) == 2:
+                rock_passwords.append(temp[1])
+    finally:
+        f.close()
 
-	print "Done generating list of rock you passwords"
-	print "Saving file to new list"
+    print "Done generating list of rock you passwords"
+    print "Saving file to new list"
 
-	rock_you_clean = open('rockyou_clean.csv', 'wb')
-	writer = csv.writer(rock_you_clean, dialect = 'excel')
-	for i in rock_passwords:
-		writer.writerow([i])
+    rock_you_clean = open('rockyou_clean.csv', 'wb')
+    writer = csv.writer(rock_you_clean, dialect='excel')
+    for i in rock_passwords:
+        writer.writerow([i])
 
 
 def distance_ratio(s1, s2):
