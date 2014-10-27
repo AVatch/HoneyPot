@@ -13,7 +13,7 @@ def pollinateMe(p, k):
     pot = [p]
 
     print "~"*50
-    print rock_you_like_a_hurricane(p, 5)
+    print rock_you_like_a_hurricane(p, k)
     print "~"*50
 
     # Get number of buckets
