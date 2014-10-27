@@ -1,38 +1,39 @@
 import sys
 import random
 import honey_functions as hf
-from rock_you_generator import distance_ratio
+# from rock_you_generator import distance_ratio
 
 
 '''
 Main Functions
 '''
 
+
 def pollinateMe(p, k):
     pot = [p]
 
     # Get number of buckets
-    buckets = random.randrange(1,k)
+    buckets = random.randrange(1, k)
     while (k % buckets):
-        buckets = random.randrange(1,k)
+        buckets = random.randrange(1, k)
     count = int(k/buckets)
 
     # Choose a random seed for every bucket
-    for i in range(0,buckets) :
+    for i in range(0, buckets):
         seed = random.choice(pot)
-        n_trans = random.randrange(1,len(hf.FUNCTIONS))
+        n_trans = random.randrange(1, len(hf.FUNCTIONS))
         # Choose a random function for every count in bucket
-        for j in range(0,count) :
+        for j in range(0, count):
             honey = seed
             # Transform word a random number of times
-            for k in range(0,n_trans) :
+            for k in range(0, n_trans):
                 weight = random.random()
                 func = random.choice(hf.FUNCTIONS)
-                honey = func(honey,weight)
+                honey = func(honey, weight)
                 # Make sure the honey isn't already in the pot
                 while honey in pot:
                     func = random.choice(hf.FUNCTIONS)
-                    honey = func(honey,weight)
+                    honey = func(honey, weight)
             pot.append(honey)
 
     random.shuffle(pot)

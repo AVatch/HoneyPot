@@ -10,10 +10,6 @@ IMPORTANT: Add all function names to list 'FUNCTIONS' at the bottom of this file
 '''
 
 
-'''
-Gives back a word with parts of it changed
-
-'''
 def word_parts(word, weight):
     #print "[Word Parts] Input:\t", word
     p = random.random()
@@ -57,8 +53,8 @@ Gives back a leet version of the given word
 '''
 
 L33T_LIST = {
-    'a': '@','b': '13','e': '3', 'f':'ph', 'g': '6',
-    'o': '0','l': '1','s': '$','r': 'i2','w': 'vv'
+    'a': '@', 'b': '13', 'e': '3', 'f':'ph', 'g': '6',
+    'o': '0', 'l': '1', 's': '$', 'r': 'i2', 'w': 'vv'
 }
 
 def l33t_word(word, weight):
@@ -98,10 +94,9 @@ def delta_word(word, weight):
     #print "[delta word] Output:\t", word
     return word
 
-'''
-  Tweaks the year
-'''
-def year_tweaker(password, weight):
+
+
+def year_tweaker(password, weight=1):
     ## detects yr between 1950-2014 and changes yr
     ## to year + 1 in password
     match = re.findall(r'\d{4}', password)
@@ -109,30 +104,54 @@ def year_tweaker(password, weight):
         if int(m) in range(1950,2015):
             n = int(m) + 1
             password = password.replace(m,str(n))
-    return password
+    print password
 
-'''
-    Tweaks the tail
-'''
-def tail_tweaker(password, weight):
-    #tweaks the tail of a password with a random digit at the end
+def tail_tweaker(password, weight=1):
+    # tweaks the tail a substring of consecutives digits within 
+    # a password with a random digit at end of string
     tuples = re.findall(r'(\w+?)(\d+)', password)
     for x,y in tuples[-1:]:
         tail = int(y) + random.randint(0,10)
-        password = password.replace(y,str(tail))
-    return password
+        if password.replace(y,str(tail)) == password:
+            password = password.replace(y,str(tail-1))
+        else:
+            password = password.replace(y,str(tail))
+    print password
 
-'''
-    Tweaks the head
-'''
-def head_tweaker(password, weight):
-    #tweaks the head of a password with random digits
-    tuples = re.findall(r'(\w+?)(\d+)', password) 
-    for y in tuples[0]:
-        head = int(y) + random.randint(0,10)
-        password = password.replace(y,str(head))
-    return password
+def head_tweaker(password, weight=1):
+    # tweaks the head of a password with random digits
+    # if password doesn't start with digits returns same password
+    tuples = re.findall(r'(\w+?)(\d+)', password)
+    if tuples == []:
+        print password 
+    else:
+        for y in tuples[0]:
+            try:
+                head = int(y) + random.randint(0,10)
+                password = password.replace(y,str(head))
+            except ValueError:
+                break
+        print password
 
+def lower_case(password, weight=1):
+    # tweaks upper case letters to lower case
+    new_password = ''
+    for l in range(len(password)):
+        if password[l].isupper() == True:
+            new_password += password[l].lower()
+        else:
+            new_password += password[l]
+    print new_password
+
+def upper_case(password, weight=1):
+    # tweaks lower case letters to upper case in alternate fashion
+    new_password = ''
+    for l in range(0,len(password),2):
+        if password[l].islower() == True:
+            password = password.replace(password[l], password[l].upper())
+        else:
+            continue
+    print password
 
 
 '''
