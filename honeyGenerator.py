@@ -11,50 +11,54 @@ Main Functions
 def pollinate(p, k, data_size):
     passwords = rock_you_like_a_hurricane(p, k, data_size)
     passwords.append(p)
+    seeds = []
     print passwords
-    pot = [p]
-    # Get number of buckets
-    buckets = int(math.ceil(k/2))
-    seed = random.choice(passwords)
-    pot = pollinateMe(seed,buckets,pot)
-    pot = pollinateMe(p,k-buckets,pot)
 
-    # # Choose a random seed for every bucket
-    # for i in range(0, buckets):
-    #     seed = random.choice(passwords)
-    #     pot = pollinateMe(seed,count,pot)
+    # Add more seeds
+    for pw in passwords:
+        seeds.append(pw)
+        for i in xrange(int(math.ceil(k/len(passwords)))):
+            pw2 = hf.head_tweaker(hf.tail_tweaker(pw,1),1)
+            if not pw2 in seeds:
+                seeds.append(pw2)
+
+    print seeds
+    pot = [p]
+
+    # Get number of buckets
+    max_buckets = max(int(math.ceil(k/3)),3)
+    buckets = random.randrange(2,max_buckets)
+    count = int(math.ceil(k/buckets))
+
+    # Choose random seed and add honeywords for each bucket
+    last_length = len(pot)
+    seed = p
+    while len(pot) < k + 1:
+        if len(pot) == last_length + count:
+            seed = random.choice(seeds)
+            last_length = len(pot)
+        pot = pollinateMe(seed,pot)
+
     random.shuffle(pot)
     return pot
 
 
+def pollinateMe(p, pot):
+    max_trans = 1 
+    n_trans = random.randrange(1,3)
+    honey = p
+    threshhold = 75
+    
+    for k in range(0, n_trans):
+        weight = random.random()
+        func = random.choice(hf.FUNCTIONS)
+        honey = func(honey, weight)
+            # print func, '\t->\t', honey, '\t', distance_ratio(honey, p)
 
-
-def pollinateMe(p, count, pot): 
-    n_trans = random.randrange(1, 4)
-    # Choose a random function for every count in bucket
-    for j in range(0, count):
-        honey = p
-        threshhold = 75
-        # Transform word a random number of times
-        for k in range(0, n_trans):
-            weight = random.random()
-            func = random.choice(hf.FUNCTIONS)
-            honey = func(honey, weight)
-            # Make sure the honey isn't already in the pot
-            whC = 0
-            while honey in pot or distance_ratio(honey, p) <= threshhold:
-                func = random.choice(hf.FUNCTIONS)
-                honey = func(p, weight)
-                whC += 1
-                if whC == 100:
-                    threshhold -= 5
-                    p = random.choice(pot)
-            print func, '\t->\t', honey, '\t', distance_ratio(honey, p)
+    if not (honey in pot) and (distance_ratio(honey, p) > threshhold):
         pot.append(honey)
+
     return pot
-
-
-
 
 
 def unPollinateMe(p, k):

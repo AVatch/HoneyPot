@@ -11,7 +11,7 @@ the bottom of this file.
 
 def word_parts(word, weight):
     #print "[Word Parts] Input:\t", word
-    p = random.random()
+    p = 0#random.random()
     if p <= weight:
         # Switch both pre + suff
         for i in prefix.PREFIX_LIST:
@@ -133,22 +133,26 @@ def head_tweaker(password, weight=1):
 
 def lower_case(password, weight=1):
     # tweaks upper case letters to lower case
-    new_password = ''
-    for l in range(len(password)):
-        if password[l].isupper() is True:
-            new_password += password[l].lower()
-        else:
-            new_password += password[l]
-    return new_password
+    # new_password = ''
+    # for l in range(len(password)):
+    #     if password[l].isupper() is True:
+    #         new_password += password[l].lower()
+    #     else:
+    #         new_password += password[l]
+    c = random.randrange(0,len(password)-1)
+    if password[c].islower():
+        password = password.replace(password[c],password[c].lower())
+    return password
 
 
 def upper_case(password, weight=1):
     # tweaks lower case letters to upper case in alternate fashion
-    for l in range(0, len(password), 2):
-        if password[l].islower() is True:
-            password = password.replace(password[l], password[l].upper())
-        else:
-            continue
+    c = random.randrange(0,len(password)-1)
+    # for l in range(0, len(password), 2):
+    if password[c].islower():
+        password = password.replace(password[c], password[c].upper())
+    # else:
+        # continue
     return password
 
 
@@ -157,7 +161,7 @@ Add all function names here
 '''
 
 FUNCTIONS = [
-    # word_parts,
+    word_parts,
     l33t_word,
     delta_word,
     year_tweaker,
