@@ -9,7 +9,7 @@ Honey pot authentication scheme for Cornell Tech Securities Class
 
 Use:
 
-python honeyGenerator.py <function> <password> <number_of_honeywords> <dataset_size>
+python honeyGenerator.py (function) (password) (number_of_honeywords) (dataset_size)
 
 Example Use:
 
