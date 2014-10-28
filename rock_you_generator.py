@@ -40,25 +40,26 @@ def distance_ratio(s1, s2):
     return int((100 * m.ratio()))
 
 
-def rock_you_like_a_hurricane(p, n):
+def rock_you_like_a_hurricane(p, n, d_size):
     hot_passes = []
     pass_dist = []
     f = open('rockyou_clean.csv', 'r')
     try:
         reader = csv.reader(f)
         for i,row in enumerate(reader):
-            if i == 10**4:
-                break
-            dist = distance_ratio(p, str(row[0]))
-            if len(hot_passes) < n:
-                hot_passes.append(str(row[0]))
-                pass_dist.append(dist)
-            else:
-                d = min(pass_dist)
-                if dist > d:
-                    i = pass_dist.index(d)
-                    hot_passes[i] = str(row[0])
-                    pass_dist[i] = dist
+            if row[0] != p:
+                if i == d_size:
+                    break
+                dist = distance_ratio(p, str(row[0]))
+                if len(hot_passes) < n:
+                    hot_passes.append(str(row[0]))
+                    pass_dist.append(dist)
+                else:
+                    d = min(pass_dist)
+                    if dist > d:
+                        i = pass_dist.index(d)
+                        hot_passes[i] = str(row[0])
+                        pass_dist[i] = dist
         return hot_passes
     finally:
         f.close()
