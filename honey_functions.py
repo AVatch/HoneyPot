@@ -2,6 +2,7 @@ import random
 import re
 import prefix
 import suffix
+import string
 
 '''
 IMPORTANT: Add all function names to list 'FUNCTIONS' at
@@ -155,18 +156,26 @@ def upper_case(password, weight=1):
         # continue
     return password
 
+def add_to_end(password, weight=1):
+    #c = random.choice(string.ascii_uppercase + string.digits)
+    c = random.choice(string.digits)
+    password = password + c
+    return password
+
+
 
 '''
 Add all function names here
 '''
 
 FUNCTIONS = [
-    word_parts,
-    l33t_word,
-    delta_word,
     year_tweaker,
     tail_tweaker,
     head_tweaker,
     lower_case,
     upper_case,
+    add_to_end,
+    l33t_word,
+    word_parts,
+    delta_word
 ]
