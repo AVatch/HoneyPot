@@ -94,8 +94,7 @@ def pollinate_file(p, k):
             elif i < 200:
                 d_size = 100
             else:
-                #d_size = None
-                pass
+                d_size = 3000000
             words = pollinate(line.strip(), k_honey_words, d_size)
             f_out_name = directory + "/" + str(i + 1)
             with open(f_out_name,'w+') as f_out:
