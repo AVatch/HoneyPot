@@ -16,6 +16,7 @@ def pollinate(p, k, data_size):
     # Get number of buckets
     buckets = int(math.ceil(k/2))
     seed = random.choice(passwords)
+    print p, seed
     pot = pollinateMe(seed,buckets,pot)
     pot = pollinateMe(p,k-buckets,pot)
 
