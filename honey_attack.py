@@ -1,6 +1,8 @@
 import numpy as np
 import csv
 import datetime
+import random
+import enchant
 from rock_you_generator import distance_ratio
 
 
@@ -14,13 +16,66 @@ def loadtxt(f):
     return password
 
 
-# def check_against_rockyou(p, rockyou):
+def check_against_rockyou(p, rockyou):
+    for w in rockyou:
+        if w == p:
+            return True
+    return False
 
+'''
+Helper Functions
+'''
 
+def entropy_score(word):
+    upper = 0.
+    lower = 0.
+    digits = 0.
+    special = 0.
+    for i in word:
+        if i.isdigit():
+            digits += 1
+        elif i.isupper():
+            upper += 1
+        elif i.islower():
+            lower += 0
+        else:
+            special += 1
+    score = int(round(1 - (upper + lower + digits + special)/len(word)))
+
+    return score
+
+def root_score(word, wordlist):
+    score = 0
+    for i in range(len(wordlist)):
+        if word in wordlist[i][0]:
+            score += 1
+    return score
+
+def spelling_score(word):
+    d = enchant.Dict("en_US")
+    word = word.lower()
+    word = word.translate(None, '!@#$%^&*_-=+~1234567890')
+    if d.check(word):
+        return 1
+    else:
+        return 0
+
+def similarity_score(word, wordlist):
+    pass
+
+def get_score(word, wordlist):
+    e_score = entropy_score(word)
+    r_score = root_score(word, wordlist)
+    s_score = spelling_score(word)
+
+    total = e_score + r_score + s_score
+    return total
 
 # Load data
-
-pass_file = loadtxt("group1/3")
+filename = "group1"
+filename = "foreign_honey/honeywords"
+password_number = random.randint(1,300)
+pass_file = loadtxt(filename+"/"+str(password_number))
 #print "[", datetime.datetime.now(), "]\tlodaed password"
 rockyou = []
 rockyou_threshold = 10
@@ -74,7 +129,19 @@ for i in range(len(pairs)):
     if pairs[i][0] not in honey_words_to_break:
         honey_words_to_break.append(pairs[i][0])
 
+# If it's a known set, then print the actual password (FOR TESTING)
+if filename == "group1":
+    with open("group1.txt") as f:
+        lines = f.readlines()    
+        print "Original Password: " + lines[password_number-1]
+
 print "List of all honeywords in file"
-print pass_file
+for i in range(len(pass_file)):
+    p = pass_file[i][0]
+    score = get_score(p,pass_file)
+    print p + " : " + str(score)
+# print pass_file
 print "List of honey words above threshold"
 print honey_words_to_break
+
+print "Password Number: " + str(password_number)

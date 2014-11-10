@@ -100,27 +100,6 @@ def pollinate_file(p, k):
             with open(f_out_name,'w+') as f_out:
                 f_out.write('\n'.join(words))
 
-    
-
-'''
-Helper Functions
-'''
-
-
-def entropy(word):
-    upper = 0
-    lower = 0
-    digits = 0
-    for i in word:
-        if i.isdigit():
-            digits += 1
-        if i.isupper():
-            upper += 1
-        if i.islower():
-            lower += 1
-
-    print upper, '\t', lower, '\t', digits
-
 
 # Execute Code
 if __name__ == '__main__':
