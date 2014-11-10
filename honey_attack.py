@@ -20,8 +20,8 @@ def loadtxt(f):
 
 # Load data
 
-pass_file = loadtxt("group1/1")
-print "[", datetime.datetime.now(), "]\tlodaed password"
+pass_file = loadtxt("group1/3")
+#print "[", datetime.datetime.now(), "]\tlodaed password"
 rockyou = []
 rockyou_threshold = 10
 with open("rockyou_clean.csv", "r") as rf:
@@ -31,8 +31,8 @@ with open("rockyou_clean.csv", "r") as rf:
             break
         else:
             rockyou.append(row[0])
-print "[", datetime.datetime.now(), "]\tlodaed rockyou"
-print rockyou
+#print "[", datetime.datetime.now(), "]\tlodaed rockyou"
+#print rockyou
 
 # Create similiarity matrix
 pass_matrix = [[] for x in range(0, len(pass_file))]
@@ -65,7 +65,6 @@ print "Above threshold: ", threshold
 for i in pairs:
     print i
 
-
 # Create a set of honey words
 print "*"*50
 honey_words_to_break = []
@@ -75,5 +74,7 @@ for i in range(len(pairs)):
     if pairs[i][0] not in honey_words_to_break:
         honey_words_to_break.append(pairs[i][0])
 
-print "List of honey words"
+print "List of all honeywords in file"
+print pass_file
+print "List of honey words above threshold"
 print honey_words_to_break
