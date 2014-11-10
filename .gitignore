@@ -1,3 +1,4 @@
 *.csv
 *.zip
 group1.txt
+*.pyc
