@@ -1,5 +1,8 @@
 import numpy as np
+import csv
+import datetime
 from rock_you_generator import distance_ratio
+
 
 def loadtxt(f):
     password = np.loadtxt(f,
@@ -10,9 +13,26 @@ def loadtxt(f):
                           unpack=True)
     return password
 
-# Load data
-pass_file = loadtxt("group1/1")
 
+# def check_against_rockyou(p, rockyou):
+
+
+
+# Load data
+
+pass_file = loadtxt("group1/1")
+print "[", datetime.datetime.now(), "]\tlodaed password"
+rockyou = []
+rockyou_threshold = 10
+with open("rockyou_clean.csv", "r") as rf:
+    reader = csv.reader(rf)
+    for row in reader:
+        if len(rockyou) > rockyou_threshold - 1:
+            break
+        else:
+            rockyou.append(row[0])
+print "[", datetime.datetime.now(), "]\tlodaed rockyou"
+print rockyou
 
 # Create similiarity matrix
 pass_matrix = [[] for x in range(0, len(pass_file))]
@@ -44,3 +64,16 @@ print "*"*50
 print "Above threshold: ", threshold
 for i in pairs:
     print i
+
+
+# Create a set of honey words
+print "*"*50
+honey_words_to_break = []
+for i in range(len(pairs)):
+    if len(honey_words_to_break) == 0:
+        honey_words_to_break.append(pairs[i][0])
+    if pairs[i][0] not in honey_words_to_break:
+        honey_words_to_break.append(pairs[i][0])
+
+print "List of honey words"
+print honey_words_to_break
