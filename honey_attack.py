@@ -12,6 +12,7 @@ from rock_you_generator import distance_ratio
 def loadtxt(f):
     password = np.loadtxt(f,
                           delimiter='\n',
+                          comments=None,
                           dtype={
                                  'names': ('password',),
                                  'formats': ('S99',)},
@@ -190,12 +191,12 @@ def guess_password(wordlist, rockyou, password_number, debug = False):
 # Execute Code
 if __name__ == '__main__':
     # Load data
-    filename = "group1"
-    #filename = "foreign_honey/honeywords"
+    dir_name = "group1"
+    #dir_name = "foreign_honey/honeywords"
 
-    #print "[", datetime.datetime.now(), "]\tlodaed password"
+    # Load Rockyou Dataset
     rockyou = []
-    rockyou_threshold = 100
+    rockyou_threshold = 10000
     with open("rockyou_clean.csv", "r") as rf:
         reader = csv.reader(rf)
         for row in reader:
@@ -203,10 +204,8 @@ if __name__ == '__main__':
                 break
             else:
                 rockyou.append(row[0])
-    #print "[", datetime.datetime.now(), "]\tlodaed rockyou"
-    #print rockyou
 
-    debug = False
+    debug = False   ### Set to True to print a single file analysis, false to write to file our guesses
 
     min_pw = 1
     max_pw = 300
@@ -223,13 +222,19 @@ if __name__ == '__main__':
         if debug: print "Password Number: " + str(max_pw)   
 
         password_number = i
-        pass_file = loadtxt(filename+"/"+str(password_number))
+        pass_file = loadtxt(dir_name+"/"+str(password_number))
         chosen_word = guess_password(pass_file, rockyou, password_number, debug)
         password_guess_list.append(chosen_word)
+        file_name = dir_name + '.txt'
+
+    group_file = open(file_name, 'wb')
+    writer = csv.writer(group_file, dialect='excel')
+    for p in password_guess_list:
+        writer.writerow([p])
 
 
         # If it's a known set, then print the actual password (FOR TESTING)
-        if filename == "group1":
+        if dir_name == "group1":
             with open("group1.txt") as f:
                 lines = f.readlines()    
                 original_word = lines[password_number-1].strip() 
@@ -237,17 +242,16 @@ if __name__ == '__main__':
                 if original_word == chosen_word:
                     correct_count += 1
 
-
     # TEST REGRESSION MODEL #
 
     cc_model = 0.
-    model = train_guesser("group1.txt", filename, rockyou, debug)
+    model = train_guesser("group1.txt", dir_name, rockyou, debug)
 
     for i in range(min_pw,max_pw + 1):
         max_score = 0
         chosen_word = ''
         password_number = i
-        pass_file = loadtxt(filename+"/"+str(password_number))
+        pass_file = loadtxt(dir_name+"/"+str(password_number))
         features = get_features(pass_file, rockyou, password_number, debug)
 
         for j in range(len(pass_file)):
@@ -257,7 +261,7 @@ if __name__ == '__main__':
                 max_score = score
                 chosen_word = word
 
-        if filename == "group1":
+        if dir_name == "group1":
             with open("group1.txt") as f:
                 lines = f.readlines()    
                 original_word = lines[password_number-1].strip() 
@@ -269,6 +273,5 @@ if __name__ == '__main__':
     print "Percentage Correct: " + str(100*correct_count/300.) +"%"
     print "Percentage Correct (model): " + str(100*cc_model/300.) +"%"
 
-
-
+    print len(password_guess_list)
 
