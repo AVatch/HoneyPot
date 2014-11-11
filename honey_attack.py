@@ -178,35 +178,33 @@ if __name__ == '__main__':
     #print rockyou
 
     debug = False
+
+    min_pw = 1
+    max_pw = 300
+    if debug:
+        min_pw = random.randint(1,300)
+        max_pw = min_pw
+
     password_guess_list = []
 
-    if debug:
-        password_number = random.randint(1,300)
-        print "Password Number: " + str(password_number)
+    correct_count = 0.
+    for i in range(min_pw,max_pw + 1):
+
+        if debug: print "Password Number: " + str(max_pw)   
+
+        password_number = i
         pass_file = loadtxt(filename+"/"+str(password_number))
+        chosen_word = guess_password(pass_file, rockyou, password_number, debug)
+        password_guess_list.append(chosen_word)
+
         # If it's a known set, then print the actual password (FOR TESTING)
         if filename == "group1":
             with open("group1.txt") as f:
                 lines = f.readlines()    
-                print "Original Password: " + lines[password_number-1]
-
-        chosen_word = guess_password(pass_file, rockyou, password_number, debug)
-
-    else:
-        correct_count = 0.
-        for i in range(1,300):
-            password_number = i
-            pass_file = loadtxt(filename+"/"+str(password_number))
-            chosen_word = guess_password(pass_file, rockyou, password_number, debug)
-            password_guess_list.append(chosen_word)
-
-            # If it's a known set, then print the actual password (FOR TESTING)
-            if filename == "group1":
-                with open("group1.txt") as f:
-                    lines = f.readlines()    
-                    original_word = lines[password_number-1].strip() 
-                    print "Original Password: " + original_word + " \t\t\t Chosen Password: " + chosen_word
-                    if original_word == chosen_word:
-                        correct_count += 1
-        print "Percentage Correct: " + str(correct_count/300.)
+                original_word = lines[password_number-1].strip() 
+                print "Original Password: " + original_word + " \t\t\t Chosen Password: " + chosen_word
+                if original_word == chosen_word:
+                    correct_count += 1
+    print "Percentage Correct: " + str(correct_count/300.)
+    print len(password_guess_list)
 
