@@ -10,6 +10,7 @@ from rock_you_generator import distance_ratio
 def loadtxt(f):
     password = np.loadtxt(f,
                           delimiter='\n',
+                          comments=None,
                           dtype={
                                  'names': ('password',),
                                  'formats': ('S99',)},
@@ -109,6 +110,7 @@ def similarity_set(wordlist, debug):
     if debug: 
         print "*"*50
 
+
     honey_words_to_break = []
     for i in range(len(pairs)):
         if len(honey_words_to_break) == 0:
@@ -118,7 +120,6 @@ def similarity_set(wordlist, debug):
     
     if debug:
         print "List of honey words above threshold"
-        print honey_words_to_break 
 
     return honey_words_to_break
 
@@ -161,7 +162,7 @@ def guess_password(wordlist, rockyou, password_number, debug = False):
 # Execute Code
 if __name__ == '__main__':
     # Load data
-    filename = "foreign_honey/group3_pswds"
+    filename = "foreign_honey/TeamShaZafDan"
     #filename = "foreign_honey/honeywords"
 
     #print "[", datetime.datetime.now(), "]\tlodaed password"
@@ -177,7 +178,7 @@ if __name__ == '__main__':
     #print "[", datetime.datetime.now(), "]\tlodaed rockyou"
     #print rockyou
 
-    debug = True   ### Set to True to print a single file analysis, false to write to file our guesses
+    debug = False   ### Set to True to print a single file analysis, false to write to file our guesses
 
     min_pw = 1
     max_pw = 300
@@ -192,7 +193,7 @@ if __name__ == '__main__':
 
         if debug: print "Password Number: " + str(max_pw)   
 
-        password_number = 25
+        password_number = i
         pass_file = loadtxt(filename+"/"+str(password_number))
         chosen_word = guess_password(pass_file, rockyou, password_number, debug)
         password_guess_list.append(chosen_word)
