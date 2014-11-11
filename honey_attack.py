@@ -118,7 +118,7 @@ def similarity_set(wordlist, debug):
     
     if debug:
         print "List of honey words above threshold"
-        print honey_words_to_break
+        print honey_words_to_break 
 
     return honey_words_to_break
 
@@ -166,7 +166,7 @@ if __name__ == '__main__':
 
     #print "[", datetime.datetime.now(), "]\tlodaed password"
     rockyou = []
-    rockyou_threshold = 10
+    rockyou_threshold = 10000
     with open("rockyou_clean.csv", "r") as rf:
         reader = csv.reader(rf)
         for row in reader:
@@ -177,7 +177,7 @@ if __name__ == '__main__':
     #print "[", datetime.datetime.now(), "]\tlodaed rockyou"
     #print rockyou
 
-    debug = False
+    debug = True   ### Set to True to print a single file analysis, false to write to file our guesses
 
     min_pw = 1
     max_pw = 300
@@ -192,7 +192,7 @@ if __name__ == '__main__':
 
         if debug: print "Password Number: " + str(max_pw)   
 
-        password_number = i
+        password_number = 25
         pass_file = loadtxt(filename+"/"+str(password_number))
         chosen_word = guess_password(pass_file, rockyou, password_number, debug)
         password_guess_list.append(chosen_word)
@@ -210,6 +210,7 @@ if __name__ == '__main__':
                 print "Original Password: " + original_word + " \t\t\t Chosen Password: " + chosen_word
                 if original_word == chosen_word:
                     correct_count += 1
+
     print "Percentage Correct: " + str(correct_count/300.)
     print len(password_guess_list)
 
