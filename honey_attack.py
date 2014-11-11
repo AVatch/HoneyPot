@@ -4,6 +4,8 @@ import datetime
 import random
 import enchant
 import re
+import sklearn.linear_model as sk
+from sklearn.svm import SVC
 from rock_you_generator import distance_ratio
 
 
@@ -16,16 +18,11 @@ def loadtxt(f):
                           unpack=True)
     return password
 
-
 def check_against_rockyou(p, rockyou):
     for w in rockyou:
         if w == p:
             return True
     return False
-
-'''
-Helper Functions
-'''
 
 def entropy_score(word):
     upper = 0.
@@ -41,16 +38,16 @@ def entropy_score(word):
             lower += 0
         else:
             special += 1
-    score = int(round(1 - (upper + lower + digits + special)/len(word)))
+    score = 1 - (upper + lower + digits + special)/len(word)
 
     return score
 
 def root_score(word, wordlist):
-    score = 0
+    score = 0.
     for i in range(len(wordlist)):
         if word in wordlist[i][0]:
             score += 1
-    return score
+    return score/len(wordlist)
 
 def word_score(word):
     d = enchant.Dict("en_US")
@@ -58,27 +55,25 @@ def word_score(word):
     word = word.translate(None, '!@#$%^&*_-=+~1234567890')
     if not word == '':
         if d.check(word):
-            return 1
-    return 0
+            return 1.
+    return 0.
 
 def rockyou_score(word, rockyou, password_number):
     if password_number < 100: 
         for w in rockyou:
             if w == word:
-                return 1
-    return 0
+                return 1.
+    return 0.
 
 def year_score(word):
     match = re.findall(r'\d{4}', word)
     for m in match:
         if int(m) in range(1950, 2015):
-            return 1
-        else:
-            return 0
-    return 0
+            return 1.
+    return 0.
  
 
-def similarity_set(wordlist, debug):
+def similarity_scores(wordlist, debug):
     # Create similiarity matrix
     pass_matrix = [[] for x in range(0, len(wordlist))]
 
@@ -109,38 +104,71 @@ def similarity_set(wordlist, debug):
     if debug: 
         print "*"*50
 
-    honey_words_to_break = []
-    for i in range(len(pairs)):
-        if len(honey_words_to_break) == 0:
-            honey_words_to_break.append(pairs[i][0])
-        if pairs[i][0] not in honey_words_to_break:
-            honey_words_to_break.append(pairs[i][0])
-    
-    if debug:
-        print "List of honey words above threshold"
-        print honey_words_to_break
+    # honey_words_to_break = []
+    # for i in range(len(pairs)):
+    #     if len(honey_words_to_break) == 0:
+    #         honey_words_to_break.append(pairs[i][0])
+    #     if pairs[i][0] not in honey_words_to_break:
+    #         honey_words_to_break.append(pairs[i][0])
 
-    return honey_words_to_break
+    honey_occurences = np.zeros(10)
+    for i, w in enumerate(wordlist):
+        for p in pairs:
+            if p[0] == w[0]:
+                honey_occurences[i] = 1
+    #if len(pairs)>0: honey_occurences = honey_occurences/len(pairs)
+
+    return honey_occurences
+
+
+def train_guesser(p_file, hp_dir, rockyou, debug = False):
+    predictor_x = np.zeros((3000,6))
+    predictor_y = np.zeros(3000)
+    real_words = []
+
+    with open(p_file) as f:
+        real_words = f.readlines()
+
+    for i in range(0,300):
+        password_number = i + 1
+        wordlist = loadtxt(hp_dir+"/"+str(password_number))
+        features = get_features(wordlist, rockyou, password_number, debug)
+
+        for j in range(len(wordlist)):
+            word = wordlist[j][0]
+            predictor_x[10*i + j] = features[j,:]
+            predictor_y[10*i + j] = 1. if word == real_words[i].strip() else 0.
+
+    pr = sk.LinearRegression()
+    #pr = SVC()
+    pr.fit(predictor_x, predictor_y)
+    return pr
+
+
+def get_features(wordlist, rockyou, password_number, debug = False):
+    s_scores = similarity_scores(wordlist,debug)
+    feature_array = np.zeros((10,6))
+    for i in range(len(wordlist)):
+            word = wordlist[i][0]
+            e_score = entropy_score(word)
+            r_score = root_score(word, wordlist)
+            w_score = word_score(word)
+            y_score = year_score(word)
+            ry_score = rockyou_score(word, rockyou, password_number)
+            feature_array[i] = [e_score, r_score, w_score, y_score, ry_score, s_scores[i]]
+
+    return feature_array
 
 
 def guess_password(wordlist, rockyou, password_number, debug = False):
     word_scores = [] #[[] for x in range(0, len(wordlist))]
-    s_set = similarity_set(wordlist, debug)
+    features = get_features(wordlist, rockyou, password_number, debug)
 
     for i in range(len(wordlist)):
         total = 0
         word = wordlist[i][0]
-        e_score = entropy_score(word)
-        r_score = root_score(word, wordlist)
-        w_score = word_score(word)
-        y_score = year_score(word)
-        ry_score = rockyou_score(word, rockyou, password_number)
-        total = e_score + r_score + w_score + y_score + ry_score
-        if word in s_set:
-            total += 1
+        total = np.sum(features[i,:])
         word_scores.append([word, total])
-
-    if debug: print word_scores
 
     if debug:
         print "*"*50
@@ -158,6 +186,7 @@ def guess_password(wordlist, rockyou, password_number, debug = False):
 
     return chosen_word
 
+
 # Execute Code
 if __name__ == '__main__':
     # Load data
@@ -166,7 +195,7 @@ if __name__ == '__main__':
 
     #print "[", datetime.datetime.now(), "]\tlodaed password"
     rockyou = []
-    rockyou_threshold = 10
+    rockyou_threshold = 100
     with open("rockyou_clean.csv", "r") as rf:
         reader = csv.reader(rf)
         for row in reader:
@@ -188,6 +217,7 @@ if __name__ == '__main__':
     password_guess_list = []
 
     correct_count = 0.
+
     for i in range(min_pw,max_pw + 1):
 
         if debug: print "Password Number: " + str(max_pw)   
@@ -197,14 +227,48 @@ if __name__ == '__main__':
         chosen_word = guess_password(pass_file, rockyou, password_number, debug)
         password_guess_list.append(chosen_word)
 
+
         # If it's a known set, then print the actual password (FOR TESTING)
         if filename == "group1":
             with open("group1.txt") as f:
                 lines = f.readlines()    
                 original_word = lines[password_number-1].strip() 
-                print "Original Password: " + original_word + " \t\t\t Chosen Password: " + chosen_word
+                if debug: print "Original Password: " + original_word + " \t\t Chosen Password: " + chosen_word
                 if original_word == chosen_word:
                     correct_count += 1
-    print "Percentage Correct: " + str(correct_count/300.)
-    print len(password_guess_list)
+
+
+    # TEST REGRESSION MODEL #
+
+    cc_model = 0.
+    model = train_guesser("group1.txt", filename, rockyou, debug)
+
+    for i in range(min_pw,max_pw + 1):
+        max_score = 0
+        chosen_word = ''
+        password_number = i
+        pass_file = loadtxt(filename+"/"+str(password_number))
+        features = get_features(pass_file, rockyou, password_number, debug)
+
+        for j in range(len(pass_file)):
+            word = pass_file[j][0]
+            score = model.predict(features[j,:])
+            if score > max_score:
+                max_score = score
+                chosen_word = word
+
+        if filename == "group1":
+            with open("group1.txt") as f:
+                lines = f.readlines()    
+                original_word = lines[password_number-1].strip() 
+                print "Original Password: " + original_word + " \t\t Chosen Password: " + chosen_word
+                if original_word == chosen_word:
+                    cc_model += 1
+
+
+    print "Percentage Correct: " + str(100*correct_count/300.) +"%"
+    print "Percentage Correct (model): " + str(100*cc_model/300.) +"%"
+
+
+
 
