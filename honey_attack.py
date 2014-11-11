@@ -161,7 +161,7 @@ def guess_password(wordlist, rockyou, password_number, debug = False):
 # Execute Code
 if __name__ == '__main__':
     # Load data
-    filename = "group1"
+    filename = "foreign_honey/group3_pswds"
     #filename = "foreign_honey/honeywords"
 
     #print "[", datetime.datetime.now(), "]\tlodaed password"
@@ -196,6 +196,11 @@ if __name__ == '__main__':
         pass_file = loadtxt(filename+"/"+str(password_number))
         chosen_word = guess_password(pass_file, rockyou, password_number, debug)
         password_guess_list.append(chosen_word)
+        file_name = filename + '.txt'
+    group_file = open(file_name, 'wb')
+    writer = csv.writer(group_file, dialect='excel')
+    for p in password_guess_list:
+        writer.writerow([p])
 
         # If it's a known set, then print the actual password (FOR TESTING)
         if filename == "group1":
