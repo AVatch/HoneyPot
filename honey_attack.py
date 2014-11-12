@@ -5,7 +5,9 @@ import random
 import enchant
 import re
 import sklearn.linear_model as sk
-from sklearn.svm import SVC
+from string import maketrans
+
+
 from rock_you_generator import distance_ratio
 
 
@@ -53,11 +55,30 @@ def root_score(word, wordlist):
 def word_score(word):
     d = enchant.Dict("en_US")
     word = word.lower()
-    word = word.translate(None, '!@#$%^&*_-=+~1234567890')
-    if not word == '':
-        if d.check(word):
-            return 1.
-    return 0.
+    instr = '!@#$%^&*_-=+~1234567890'
+    otstr = '                       '
+    ttab = maketrans(instr, otstr)
+    word = word.translate(ttab)
+    score = 0.
+    words = word.split()
+    for w in words:
+        if not w == '':
+            if d.check(w):
+                score += 1
+
+    # if not word == '':
+    #     for i,c in enumerate(word):
+    #         w1 = word[:i]
+    #         w2 = word[i:]
+    #         w1r = d.check(w1) if not w1 == '' else True
+    #         w2r = d.check(w2) if not w2 == '' else True
+    #         if w1r:
+    #             score +=1
+    #         if w2r:
+    #             score +=1.
+    if len(words)>0: score = score/len(words)
+
+    return score
 
 def rockyou_score(word, rockyou, password_number):
     if password_number < 100: 
@@ -112,57 +133,60 @@ def similarity_scores(wordlist, debug):
     #     if pairs[i][0] not in honey_words_to_break:
     #         honey_words_to_break.append(pairs[i][0])
 
-    honey_occurences = np.zeros(10)
+    honey_occurences = np.zeros(len(wordlist))
     for i, w in enumerate(wordlist):
         for p in pairs:
-            if p[0] == w[0]:
+            if p[0] == w[0] or p[1] == w[0]:
                 honey_occurences[i] = 1
+
     #if len(pairs)>0: honey_occurences = honey_occurences/len(pairs)
 
     return honey_occurences
 
 
-def train_guesser(p_file, hp_dir, rockyou, debug = False):
-    predictor_x = np.zeros((3000,6))
-    predictor_y = np.zeros(3000)
-    real_words = []
+# def train_guesser(p_file, hp_dir, rockyou, debug = False):
+#     debug = False
+#     predictor_x = np.zeros((3000,6))
+#     predictor_y = np.zeros(3000)
+#     real_words = []
 
-    with open(p_file) as f:
-        real_words = f.readlines()
+#     with open(p_file) as f:
+#         real_words = f.readlines()
 
-    for i in range(0,300):
-        password_number = i + 1
-        wordlist = loadtxt(hp_dir+"/"+str(password_number))
-        features = get_features(wordlist, rockyou, password_number, debug)
+#     for i in range(0,300):
+#         password_number = i + 1
+#         wordlist = loadtxt(hp_dir+"/"+str(password_number))
+#         features = get_features(wordlist, rockyou, password_number, debug)
 
-        for j in range(len(wordlist)):
-            word = wordlist[j][0]
-            predictor_x[10*i + j] = features[j,:]
-            predictor_y[10*i + j] = 1. if word == real_words[i].strip() else 0.
+#         for j in range(len(wordlist)):
+#             word = wordlist[j][0]
+#             predictor_x[10*i + j] = features[j,:]
+#             predictor_y[10*i + j] = 1. if word == real_words[i].strip() else 0.
 
-    pr = sk.LinearRegression()
-    #pr = SVC()
-    pr.fit(predictor_x, predictor_y)
-    return pr
+#     pr = sk.LinearRegression()
+#     pr.fit(predictor_x, predictor_y)
+#     return pr
 
 
 def get_features(wordlist, rockyou, password_number, debug = False):
     s_scores = similarity_scores(wordlist,debug)
-    feature_array = np.zeros((10,6))
+    feature_array = np.zeros((len(wordlist),6))
     for i in range(len(wordlist)):
             word = wordlist[i][0]
-            e_score = entropy_score(word)
-            r_score = root_score(word, wordlist)
-            w_score = word_score(word)
+            e_score = 1.5*entropy_score(word)
+            r_score = 0.5*root_score(word, wordlist)
+            w_score = 0.25*word_score(word)
             y_score = year_score(word)
             ry_score = rockyou_score(word, rockyou, password_number)
             feature_array[i] = [e_score, r_score, w_score, y_score, ry_score, s_scores[i]]
-
+    if debug:
+        print "*"*50
+        print feature_array
     return feature_array
 
 
 def guess_password(wordlist, rockyou, password_number, debug = False):
-    word_scores = [] #[[] for x in range(0, len(wordlist))]
+    word_scores = []
     features = get_features(wordlist, rockyou, password_number, debug)
 
     for i in range(len(wordlist)):
@@ -190,9 +214,13 @@ def guess_password(wordlist, rockyou, password_number, debug = False):
 
 # Execute Code
 if __name__ == '__main__':
-    # Load data
-    dir_name = "group1"
-    #dir_name = "foreign_honey/honeywords"
+    print "*"*50
+    debug = False   ### Set to True to print a single file analysis, false to write to file our guesses
+    d_name = "group1"
+    dir_name = d_name
+    # d_name  = "TeamShaZafDan"
+    # dir_name = "foreign_honey/"+d_name
+    train_f_name = "group1.txt"
 
     # Load Rockyou Dataset
     rockyou = []
@@ -205,73 +233,79 @@ if __name__ == '__main__':
             else:
                 rockyou.append(row[0])
 
-    debug = False   ### Set to True to print a single file analysis, false to write to file our guesses
 
+    # Guess Passwords
     min_pw = 1
     max_pw = 300
-    if debug:
-        min_pw = random.randint(1,300)
-        max_pw = min_pw
-
     password_guess_list = []
-
-    correct_count = 0.
+    correct_count = np.zeros(3)
+    if debug:
+        min_pw = 1#random.randint(1,300)
+        max_pw = min_pw
 
     for i in range(min_pw,max_pw + 1):
 
         if debug: print "Password Number: " + str(max_pw)   
-
-        password_number = i
-        pass_file = loadtxt(dir_name+"/"+str(password_number))
-        chosen_word = guess_password(pass_file, rockyou, password_number, debug)
+        pass_file = loadtxt(dir_name+"/"+str(i))
+        chosen_word = guess_password(pass_file, rockyou, i, debug)
         password_guess_list.append(chosen_word)
-        file_name = dir_name + '.txt'
-
-    group_file = open(file_name, 'wb')
-    writer = csv.writer(group_file, dialect='excel')
-    for p in password_guess_list:
-        writer.writerow([p])
-
 
         # If it's a known set, then print the actual password (FOR TESTING)
         if dir_name == "group1":
-            with open("group1.txt") as f:
+            with open(train_f_name) as f:
                 lines = f.readlines()    
-                original_word = lines[password_number-1].strip() 
+                original_word = lines[i-1].strip() 
                 if debug: print "Original Password: " + original_word + " \t\t Chosen Password: " + chosen_word
                 if original_word == chosen_word:
-                    correct_count += 1
+                    if i < 100:
+                        correct_count[0] += 1
+                    elif i < 200:
+                        correct_count[1] += 1
+                    else:
+                        correct_count[2] += 1
 
-    # TEST REGRESSION MODEL #
+    # Write guesses to File
+    if not debug:
+        guess_f_name = "guesses"+"/"+d_name+"_guesses.txt"
+        with open(guess_f_name, 'w') as f:
+            for p in password_guess_list:
+                f.write(p+"\n")
 
-    cc_model = 0.
-    model = train_guesser("group1.txt", dir_name, rockyou, debug)
+    # # TEST REGRESSION MODEL #
+    # correct_count_model = np.zeros(3)
+    # model = train_guesser(train_f_name, dir_name, rockyou, debug)
 
-    for i in range(min_pw,max_pw + 1):
-        max_score = 0
-        chosen_word = ''
-        password_number = i
-        pass_file = loadtxt(dir_name+"/"+str(password_number))
-        features = get_features(pass_file, rockyou, password_number, debug)
+    # for i in range(min_pw,max_pw + 1):
+    #     max_score = 0
+    #     chosen_word = ''
+    #     password_number = i
+    #     pass_file = loadtxt(dir_name+"/"+str(password_number))
+    #     features = get_features(pass_file, rockyou, password_number, debug)
 
-        for j in range(len(pass_file)):
-            word = pass_file[j][0]
-            score = model.predict(features[j,:])
-            if score > max_score:
-                max_score = score
-                chosen_word = word
+    #     for j in range(len(pass_file)):
+    #         word = pass_file[j][0]
+    #         score = model.predict(features[j,:])
+    #         if score > max_score:
+    #             max_score = score
+    #             chosen_word = word
 
-        if dir_name == "group1":
-            with open("group1.txt") as f:
-                lines = f.readlines()    
-                original_word = lines[password_number-1].strip() 
-                print "Original Password: " + original_word + " \t\t Chosen Password: " + chosen_word
-                if original_word == chosen_word:
-                    cc_model += 1
-
-
-    print "Percentage Correct: " + str(100*correct_count/300.) +"%"
-    print "Percentage Correct (model): " + str(100*cc_model/300.) +"%"
-
-    print len(password_guess_list)
+    #     if dir_name == "group1":
+    #         with open(train_f_name) as f:
+    #             lines = f.readlines()    
+    #             original_word = lines[password_number-1].strip() 
+    #             if debug: print "Original Password: " + original_word + " \t\t Chosen Password: " + chosen_word
+    #             if original_word == chosen_word:
+    #                 if i < 100:
+    #                     correct_count_model[0] += 1
+    #                 elif i < 200:
+    #                     correct_count_model[1] += 1
+    #                 else:
+    #                     correct_count_model[2] += 1
+    if dir_name == "group1":
+        print "*"*50
+        print "Percentage Correct: " + str(100*np.sum(correct_count)/300.) +"%"
+        print "Count based on set: " + str(correct_count)
+        # print "Percentage Correct (model): " + str(100*np.sum(correct_count_model)/300.) +"%"
+        # print "Count based on set: " + str(correct_count_model)
+    print "*"*50
 
