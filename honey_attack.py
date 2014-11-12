@@ -218,7 +218,7 @@ if __name__ == '__main__':
     debug = False   ### Set to True to print a single file analysis, false to write to file our guesses
     d_name = "group1"
     dir_name = d_name
-    # d_name  = "TeamShaZafDan"
+    # d_name  = "group3_pswds"
     # dir_name = "foreign_honey/"+d_name
     train_f_name = "group1.txt"
 
